@@ -26,12 +26,12 @@
  */
 
 #include "Arduino.h"
+#include "Adafruit_ADS1015.h"
 #include "DFRobot_ESP_EC.h"
 #include "EEPROM.h"
 
-#define EC_PIN 34
-
 DFRobot_ESP_EC ec;
+Adafruit_ADS1115 ads;
 
 float voltage, ecValue, temperature = 25;
 
@@ -40,6 +40,8 @@ void setup()
 	Serial.begin(115200);
 	EEPROM.begin(32);//needed EEPROM.begin to store calibration k in eeprom
 	ec.begin();//by default lib store calibration k since 10 change it by set ec.begin(30); to start from 30
+	ads.setGain(GAIN_ONE);
+	ads.begin();
 }
 
 void loop()
@@ -49,7 +51,7 @@ void loop()
 	{
 
 		timepoint = millis();
-		voltage = analogRead(EC_PIN)/4095.0*3300;
+		voltage = ads.readADC_SingleEnded(0) / 10;
 		Serial.print("voltage:");
 		Serial.println(voltage, 4);
 
